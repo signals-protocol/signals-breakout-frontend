@@ -1,8 +1,11 @@
+import SolanaWalletProvider from "./web3/provider";
+import AppRouter from "./ routes/AppRouter";
+
 function App() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Hello World</h1>
-    </div>
+    <SolanaWalletProvider>
+      <AppRouter />
+    </SolanaWalletProvider>
   );
 }
 
