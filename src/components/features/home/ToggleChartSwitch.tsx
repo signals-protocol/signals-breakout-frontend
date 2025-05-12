@@ -7,7 +7,6 @@ export default function ToggleChartSwitch({
   isHeatmap,
   setIsHeatmap,
 }: ToggleChartSwitchProps) {
-  console.log(isHeatmap);
   return (
     <div className="relative flex gap-1 w-[76px] p-1 h-10 bg-neutral-100 rounded-lg cursor-pointer">
       <div

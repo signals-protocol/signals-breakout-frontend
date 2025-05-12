@@ -4,7 +4,7 @@ import BN from "bn.js";
 import type { HeatmapDatum } from "../heatmap/heatmap.type";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { getHeatmapData } from "core/getHeatmapData";
-import { calculateBinTicket } from "core/calculateBinTicket";
+import { calculateBinShares } from "core/calculateBinShares";
 import { parseBN } from "utils/format-bn";
 import { getUSDCBalance } from "core/token";
 
@@ -29,7 +29,6 @@ export const usePredictionInput = (
   const [amount, setAmount] = useState<string>("1");
   const [balance, setBalance] = useState<number>(0);
   const [heatmapData, setHeatmapData] = useState<HeatmapDatum[]>();
-  const [allowance, setAllowance] = useState<BN>(new BN(0));
   const [isMapLoading, setIsMapLoading] = useState<boolean>(false);
   const [isTicketLoading, setIsTicketLoading] = useState<boolean>(false);
 
@@ -42,7 +41,6 @@ export const usePredictionInput = (
         setBalance(balance);
       });
     } else {
-      setAllowance(new BN(0));
       setBalance(0);
     }
   };
@@ -65,7 +63,9 @@ export const usePredictionInput = (
   useEffect(() => {
     if (currentBinId !== null && heatmapData) {
       setIsTicketLoading(true);
-      calculateBinTicket(
+      calculateBinShares(
+        connection,
+        wallet,
         selectedMarketId,
         currentBinId,
         parseBN(amount || "0")
@@ -111,7 +111,6 @@ export const usePredictionInput = (
     amount,
     setAmount,
     heatmapData,
-    shouldApprove: allowance.lt(parseBN(amount || "0")),
     balance,
     isTicketLoading,
     isMapLoading,

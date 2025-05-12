@@ -1,3 +1,5 @@
+import { formatNumber } from "utils/formatter";
+
 interface InputAmountProps {
   amount: string;
   setAmount: (amount: string) => void;
@@ -49,7 +51,7 @@ export const InputAmount = ({
           </div>
 
           <p className="text-surface-on-var text-xs text-right">
-            Balance: {balance}
+            Balance: {formatNumber(balance)}
           </p>
         </div>
       </div>

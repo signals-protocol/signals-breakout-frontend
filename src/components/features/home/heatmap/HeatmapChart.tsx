@@ -154,6 +154,7 @@ export default function HeatmapChart({
         height={CHART_CONFIG.height}
         viewBox={`0 0 ${containerWidth} ${CHART_CONFIG.height}`}
         preserveAspectRatio="xMidYMid meet"
+        onMouseLeave={() => setHoveredBin(null)}
       >
         <g
           ref={xAxisRef}

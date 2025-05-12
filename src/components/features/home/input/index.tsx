@@ -15,7 +15,6 @@ interface PredictionInputProps {
   currBin: [number, number];
   amount: string;
   setAmount: (amount: string) => void;
-  shouldApprove: boolean;
   balance: number;
   isTicketLoading: boolean;
   refreshMap: () => Promise<void>;
@@ -28,20 +27,20 @@ export default function PredictionInput({
   tickets,
   amount,
   setAmount,
-  shouldApprove,
   balance,
   isTicketLoading,
   refreshMap,
 }: PredictionInputProps) {
   const ZERO = new BN(0);
-  const avgPrice =
-    tickets.gt(ZERO) ? (parseBN(amount || "0").mul(parseBN("1"))).div(tickets) : ZERO;
+  const avgPrice = tickets.gt(ZERO)
+    ? parseBN(amount || "0")
+        .mul(parseBN("1"))
+        .div(tickets)
+    : ZERO;
   const action = useAction({
     currentBinId,
     selectedMarketId,
     amount,
-    shouldApprove,
-    tickets,
     refreshMap,
   });
 
@@ -49,7 +48,7 @@ export default function PredictionInput({
   return (
     <div className="rounded-xl border border-neutral-200 p-5">
       <div>
-          <p className="text-neutral-500 font-medium">Prediction</p>
+        <p className="text-neutral-500 font-medium">Prediction</p>
         <div className="flex justify-between mb-5">
           {currBin ? (
             <div className="font-bold text-xl">
@@ -99,10 +98,7 @@ export default function PredictionInput({
           action.state === "done" ? "btn-secondary" : "btn-primary",
           "w-full"
         )}
-        disabled={
-          action.state === "approve-loading" ||
-          action.state === "predict-loading"
-        }
+        disabled={action.state === "predict-loading"}
       >
         {action.msg}
       </button>

@@ -19,3 +19,10 @@ export const dollarFormatter = (
 export const avgPriceFormatter = (avgPrice: BN) => {
   return `${Math.floor(Number(formatBN(avgPrice, 6))) / 10}¢`;
 };
+
+export const formatNumber = (number: number, decimals: number = 6) => {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: decimals,
+    minimumFractionDigits: 0,
+  }).format(number);
+};

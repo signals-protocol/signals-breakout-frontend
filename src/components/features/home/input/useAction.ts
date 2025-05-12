@@ -1,22 +1,24 @@
-import { useWallet } from "@solana/wallet-adapter-react";
-import type BN from "bn.js";
-import { useEffect } from "react";
-import { useState } from "react";
+import BN from "bn.js";
+import RANGE_BET_IDL from "idl/range_bet_program.json";
+import { Program, AnchorProvider } from "@coral-xyz/anchor";
+import type { RangeBetProgram } from "types/range_bet_program";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { PublicKey } from "@solana/web3.js";
+import { parseBN } from "utils/format-bn";
+import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import CORE_PROGRAMS from "core/core.programs.config";
 
 interface UseActionProps {
   currentBinId: number | null;
   selectedMarketId: number;
   amount: string;
-  tickets: BN;
-  shouldApprove: boolean;
   refreshMap: () => Promise<void>;
 }
 
 type ActionState =
   | "connect-account"
-  | "need-approve"
-  | "approve-loading"
   | "can-predict"
   | "predict-loading"
   | "done";
@@ -25,43 +27,58 @@ export default function useAction({
   currentBinId,
   selectedMarketId,
   amount,
-  tickets,
-  shouldApprove,
   refreshMap,
 }: UseActionProps) {
   const nav = useNavigate();
-  const { publicKey } = useWallet();
-
-  const approve = async () => {
-    try {
-      setState("approve-loading");
-      // const signer = await getSigner();
-      // await approveUSDC(chainId, signer, parseEther(amount));
-      setState("can-predict");
-    } catch (error) {
-      console.error(error);
-      setState("need-approve");
-    }
-  };
+  const wallet = useWallet();
+  const { connection } = useConnection();
 
   const predict = async () => {
     if (currentBinId === null) return;
+    if (!wallet.publicKey) return;
     try {
       setState("predict-loading");
-      // await switchNetwork(chainId);
-      // const signer = await getSigner();
-      // await predictPrice(
-      //   chainId,
-      //   signer,
-      //   selectedMarketId,
-      //   currentBinId,
-      //   tickets,
-      //   parseEther(amount)
-      // );
+
+      const provider = new AnchorProvider(connection, wallet as any, {
+        commitment: "confirmed",
+      });
+      const program = new Program<RangeBetProgram>(RANGE_BET_IDL, provider);
+      const amountBN = parseBN(amount);
+      const [vaultAuth] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("vault"),
+          new BN(selectedMarketId).toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      const vaultAta = getAssociatedTokenAddressSync(
+        new PublicKey(CORE_PROGRAMS.USDC),
+        vaultAuth,
+        true
+      );
+      const userTokenAccount = getAssociatedTokenAddressSync(
+        new PublicKey(CORE_PROGRAMS.USDC),
+        wallet.publicKey
+      );
+
+      await program.methods
+        .buyTokens(
+          new BN(selectedMarketId),
+          [currentBinId],
+          [amountBN],
+          amountBN.mul(new BN(110)).div(new BN(100))
+        )
+        .accounts({
+          user: wallet.publicKey,
+          userTokenAccount,
+          vault: vaultAta,
+        })
+        .rpc();
+
       setState("done");
       await refreshMap();
     } catch (error) {
-      console.error("Transaction Error??????!?@#!@#!@", error);
       setState("can-predict");
     }
   };
@@ -71,22 +88,20 @@ export default function useAction({
     setState("can-predict");
   };
 
-  const [state, setState] = useState<ActionState>("need-approve");
+  const [state, setState] = useState<ActionState>("can-predict");
   useEffect(() => {
-    if (!publicKey) {
+    if (!wallet.publicKey) {
       setState("connect-account");
     } else if (state === "done") {
       return;
     } else {
-      setState(shouldApprove ? "need-approve" : "can-predict");
+      setState("can-predict");
     }
-  }, [publicKey, shouldApprove]);
+  }, [wallet.publicKey]);
 
   const onClick = () => {
     if (state === "connect-account") {
-      open();
-    } else if (state === "need-approve") {
-      approve();
+      wallet.connect();
     } else if (state === "can-predict") {
       predict();
     } else if (state === "done") {
@@ -100,10 +115,6 @@ export default function useAction({
     msg:
       state === "connect-account"
         ? "Connect Wallet"
-        : state === "need-approve"
-        ? "Approve USDC"
-        : state === "approve-loading"
-        ? "Approving"
         : state === "can-predict"
         ? "Predict"
         : state === "predict-loading"
