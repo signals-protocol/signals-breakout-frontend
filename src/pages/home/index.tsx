@@ -1,8 +1,5 @@
-import { useWallet } from "@solana/wallet-adapter-react";
+import Home from "components/features/home";
 
-export default function Home() {
-  const { publicKey } = useWallet();
-  return <div>
-    {publicKey?.toBase58()}
-  </div>;
+export default function HomePage() {
+  return <Home />;
 }
