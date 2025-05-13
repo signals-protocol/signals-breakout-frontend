@@ -9,11 +9,13 @@ import { PublicKey } from "@solana/web3.js";
 import { parseBN } from "utils/format-bn";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import CORE_PROGRAMS from "core/core.programs.config";
+import ROUTES from "routes/route-names";
 
 interface UseActionProps {
   currentBinId: number | null;
   selectedMarketId: number;
-  amount: string;
+  collateral: string;
+  shares: BN;
   refreshMap: () => Promise<void>;
 }
 
@@ -26,7 +28,8 @@ type ActionState =
 export default function useAction({
   currentBinId,
   selectedMarketId,
-  amount,
+  collateral,
+  shares,
   refreshMap,
 }: UseActionProps) {
   const nav = useNavigate();
@@ -43,7 +46,7 @@ export default function useAction({
         commitment: "confirmed",
       });
       const program = new Program<RangeBetProgram>(RANGE_BET_IDL, provider);
-      const amountBN = parseBN(amount);
+
       const [vaultAuth] = PublicKey.findProgramAddressSync(
         [
           Buffer.from("vault"),
@@ -66,8 +69,8 @@ export default function useAction({
         .buyTokens(
           new BN(selectedMarketId),
           [currentBinId],
-          [amountBN],
-          amountBN.mul(new BN(110)).div(new BN(100))
+          [shares],
+          parseBN(collateral).mul(new BN(110)).div(new BN(100))
         )
         .accounts({
           user: wallet.publicKey,
@@ -84,7 +87,7 @@ export default function useAction({
   };
 
   const toProfile = () => {
-    nav("/profile");
+    nav(ROUTES.HISTORY);
     setState("can-predict");
   };
 

@@ -18,13 +18,12 @@ export default function Home() {
     onBinClick,
     tickets,
     balance,
-    shouldApprove,
     isTicketLoading,
     refreshMap,
   } = usePredictionInput(
     PREDICTION_CONSTANTS.dateBase,
     PREDICTION_CONSTANTS.priceBase,
-    61,
+    PREDICTION_CONSTANTS.binCount,
     PREDICTION_CONSTANTS.priceStep
   );
   return (
@@ -66,7 +65,6 @@ export default function Home() {
             currBin={currBin}
             amount={amount}
             setAmount={setAmount}
-            shouldApprove={shouldApprove}
             balance={balance}
             isTicketLoading={isTicketLoading}
             refreshMap={refreshMap}

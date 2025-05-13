@@ -36,8 +36,8 @@ export const InputAmount = ({
     <div className="py-5">
       <div className="flex justify-between items-start gap-4">
         <div>
-          <span className="text-surface-on-var font-medium">Amount</span>
-          <p className="text-surface-on-var text-xs mt-1">Your confidence 🙌</p>
+          <span className="text-neutral-500 font-medium">Amount</span>
+          <p className="text-neutral-500 text-xs mt-1">Your confidence 🙌</p>
         </div>
         <div>
           <div className="inline-flex items-center text-xl font-bold ">
@@ -50,7 +50,7 @@ export const InputAmount = ({
             <p className="ml-1">USDC</p>
           </div>
 
-          <p className="text-surface-on-var text-xs text-right">
+          <p className="text-neutral-500 text-xs text-right">
             Balance: {formatNumber(balance)}
           </p>
         </div>

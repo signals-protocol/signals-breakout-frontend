@@ -5,8 +5,9 @@ export default function ConnectWalletButton() {
     <WalletMultiButton
       style={{
         backgroundColor: "var(--color-primary)",
-        height: "44px",
+        height: "40px",
         borderRadius: "10px",
+        fontSize: "14px",
       }}
     />
   );

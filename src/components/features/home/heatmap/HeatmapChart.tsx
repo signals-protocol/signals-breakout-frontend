@@ -263,7 +263,7 @@ export default function HeatmapChart({
 
       {hoveredBin && (
         <div
-          className="absolute space-y-2 w-44 bg-white text-surface-on px-4 py-3 rounded-lg shadow pointer-events-none z-10"
+          className="absolute space-y-2 w-44 bg-white text-neutral-900 px-4 py-3 rounded-lg shadow pointer-events-none z-10"
           style={{
             left: xScale(hoveredBin.date) + rectWidth / 2,
             top: yScale(hoveredBin.price)! - 10,
@@ -271,22 +271,22 @@ export default function HeatmapChart({
           }}
         >
           <div className="flex justify-between">
-            <p className="text-[10px] text-surface-on-var">Date</p>
-            <p className="text-xs font-bold text-surface-on">
+            <p className="text-[10px] text-neutral-500">Date</p>
+            <p className="text-xs font-bold text-neutral-900">
               {d3.timeFormat("%-d %b %Y")(hoveredBin.date)}
             </p>
           </div>
           <div className="flex justify-between">
-            <p className="text-[10px] text-surface-on-var">Price</p>
+            <p className="text-[10px] text-neutral-500">Price</p>
             <p className="text-xs font-bold ">
               {dollarFormatter(hoveredBin.price)}-
               {dollarFormatter(+hoveredBin.price + 500)}
             </p>
           </div>
 
-          <hr className="border-outline-var" />
+          <hr className="border-neutral-200" />
           <div className="flex justify-between">
-            <p className="text-[10px] text-surface-on-var">Tickets</p>
+            <p className="text-[10px] text-neutral-500">Tickets</p>
             <p className="text-xs font-bold">
               {hoveredBin.tickets} ({hoveredBin.perc.toFixed(2)}%)
             </p>

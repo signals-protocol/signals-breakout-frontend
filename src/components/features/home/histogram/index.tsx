@@ -89,7 +89,7 @@ const Histogram = ({
               <div className="flex-1 relative w-full">
                 <div
                   className={cn(
-                    "font-medium h-full",
+                    "font-medium h-full transition-all duration-300 ease-in-out",
                     binIndex === currentBinId
                       ? "bg-bitcoin opacity-100"
                       : "bg-primary-200 opacity-50 group-hover:bg-primary-200 group-hover:opacity-100"

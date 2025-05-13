@@ -1,5 +1,5 @@
 const CORE_PROGRAMS = {
-  RANGE_BET: "7YL1PKYG6Ev3jgeHiWzjMLsMh5xpAiqkjF9LYKvhzuVD",
+  RANGE_BET: "97i8BgDJG6yZggN2Di5UnERs6X5PqYqnkSvkMdvw1d5J",
   USDC: "GBZqLJfA3L1YvuqLuWdJCdDxW4WizKkhAk4csoxtyk9P",
 };
 

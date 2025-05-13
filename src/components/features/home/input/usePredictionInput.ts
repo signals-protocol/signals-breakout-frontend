@@ -7,6 +7,8 @@ import { getHeatmapData } from "core/getHeatmapData";
 import { calculateBinShares } from "core/calculateBinShares";
 import { parseBN } from "utils/format-bn";
 import { getUSDCBalance } from "core/token";
+import { createPriceBins } from "core/utils";
+import { AnchorProvider } from "@coral-xyz/anchor";
 
 export const usePredictionInput = (
   dateBase: Date,
@@ -62,10 +64,13 @@ export const usePredictionInput = (
 
   useEffect(() => {
     if (currentBinId !== null && heatmapData) {
+      const provider = new AnchorProvider(connection, wallet as any, {
+        commitment: "confirmed",
+      });
+
       setIsTicketLoading(true);
       calculateBinShares(
-        connection,
-        wallet,
+        provider,
         selectedMarketId,
         currentBinId,
         parseBN(amount || "0")
@@ -84,7 +89,10 @@ export const usePredictionInput = (
     refreshBalance();
   }, [wallet.publicKey]);
 
-  const currBin: [number, number] = [priceBins[currentBinId], priceBins[currentBinId + 1]];
+  const currBin: [number, number] = [
+    priceBins[currentBinId],
+    priceBins[currentBinId + 1],
+  ];
 
   const onBinClick = (marketId: number, binId: number) => {
     setCurrentBinId(binId);
@@ -119,7 +127,3 @@ export const usePredictionInput = (
     setIsHeatmap,
   };
 };
-
-function createPriceBins(startPrice: number, length: number) {
-  return Array.from({ length: length + 1 }, (_, i) => startPrice + i * 500);
-}

@@ -40,7 +40,8 @@ export default function PredictionInput({
   const action = useAction({
     currentBinId,
     selectedMarketId,
-    amount,
+    collateral: amount,
+    shares: tickets,
     refreshMap,
   });
 

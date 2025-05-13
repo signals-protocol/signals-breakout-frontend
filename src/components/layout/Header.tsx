@@ -1,5 +1,6 @@
 import { NavLink } from "react-router";
 import ConnectWalletButton from "web3/ConnectWalletButton";
+import ROUTES from "routes/route-names";
 
 export default function Header() {
   return (
@@ -15,9 +16,13 @@ export default function Header() {
               Signals
             </NavLink>
           </div>
-          
 
-          <ConnectWalletButton   />
+          <div className="flex items-center gap-6">
+            <NavLink to={ROUTES.HISTORY} className="">
+              History
+            </NavLink>
+            <ConnectWalletButton />
+          </div>
         </div>
       </nav>
     </header>

@@ -14,8 +14,8 @@ export const ToWin = ({
   return (
     <div className="flex justify-between my-5">
       <div>
-        <p className="text-surface-on-var font-medium">To win</p>
-        <p className="text-surface-on-var text-sm">Avg {avgPriceText}</p>
+        <p className="text-neutral-500 font-medium">To win</p>
+        <p className="text-neutral-500 text-sm">Avg {avgPriceText}</p>
       </div>
       <p className="text-positive font-bold text-xl">
         {isTicketLoading ? `...` : `${dollarFormatter(formatBN(tickets))}`}
