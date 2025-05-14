@@ -6,7 +6,6 @@ import {
   Keypair,
 } from "@solana/web3.js";
 import {
-  TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
   createApproveInstruction,
   createTransferInstruction,
@@ -56,28 +55,6 @@ export async function getUSDCBalance(
     );
 }
 
-export async function getAllowance(
-  connection: Connection,
-  wallet: Keypair,
-  spender: PublicKey
-): Promise<number> {
-  const owner = wallet.publicKey;
-  const tokenAccount = await getAssociatedTokenAddress(
-    new PublicKey(CORE_PROGRAMS.USDC),
-    owner
-  );
-
-  const accountInfo = await connection.getTokenAccountsByOwner(owner, {
-    programId: TOKEN_PROGRAM_ID,
-  });
-
-  const delegatedAmount =
-    accountInfo.value
-      .find((account) => account.pubkey.equals(tokenAccount))
-      ?.account.data.readBigInt64LE(64) || BigInt(0);
-
-  return Number(delegatedAmount);
-}
 
 export async function transferUSDC(
   connection: Connection,

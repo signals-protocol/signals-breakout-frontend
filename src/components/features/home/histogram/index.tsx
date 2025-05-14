@@ -1,8 +1,5 @@
-import BN from "bn.js";
 import CHART_CONFIG from "../heatmap/chart.config";
-import { useEffect, useRef, useState } from "react";
 import type { HeatmapDatum } from "../heatmap/heatmap.type";
-import { toShare } from "core/utils";
 import { HistogramRow } from "./HistogramRow";
 import { useDragInput } from "./useDragInput";
 

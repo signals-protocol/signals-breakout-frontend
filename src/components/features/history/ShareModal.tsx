@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import html2canvas from "html2canvas";
 import * as clipboard from "clipboard-polyfill";
 
@@ -33,7 +33,6 @@ export function ShareModal({
 
     try {
       // 로딩 표시 (실제 구현 시 로딩 컴포넌트로 대체 가능)
-      const originalText = "Copy Image";
       const button = document.querySelector('button:contains("Copy Image")');
       if (button) button.textContent = "Copying...";
 
