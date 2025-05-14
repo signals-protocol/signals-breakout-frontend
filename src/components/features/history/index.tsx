@@ -3,14 +3,12 @@ import HistoryHeader from "./HistoryHeader";
 import { Tabs, type TabType } from "./Tabs";
 import type { LivePrediction } from "./interfaces";
 import { LivePredictionRow } from "./LivePredictionRow";
-// import { parsePredictionLogs } from "./parser";
 import { dollarFormatter } from "utils/formatter";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import CORE_PROGRAMS from "core/core.programs.config";
 import pLimit from "p-limit";
-import { parsePredictionLogs } from "./parser";
-import { AnchorProvider } from "@coral-xyz/anchor";
+import { parsePredictionLogs } from "./parser"; 
 
 const PredictionHistory = () => {
   const wallet = useWallet();
@@ -49,13 +47,11 @@ const PredictionHistory = () => {
       res.filter((r) => r!.meta !== null)
     );
 
-    const provider = new AnchorProvider(connection, wallet as any, {
-      commitment: "confirmed",
-    });
     const parsed = await parsePredictionLogs(
       intersection.map((log) => log.signature),
       results,
-      provider
+      connection,
+      wallet
     );
     setItems(parsed);
   }
@@ -70,7 +66,7 @@ const PredictionHistory = () => {
   const totalPnl = totalPosition - totalBet;
 
   return (
-    <div className="">
+    <div className="pb-40">
       <HistoryHeader />
 
       {/* 탭 네비게이션 */}
@@ -137,8 +133,8 @@ const PredictionHistory = () => {
           </thead>
 
           <tbody className="bg-white divide-y divide-neutral-200">
-            {items.map((item) => (
-              <LivePredictionRow key={item.range} prediction={item} />
+            {items.map((item, index) => (
+              <LivePredictionRow key={index} prediction={item} />
             ))}
           </tbody>
         </table>

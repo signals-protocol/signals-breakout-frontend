@@ -1,27 +1,23 @@
 import BN from "bn.js";
-import { AnchorProvider, Program } from "@coral-xyz/anchor";
-import { PublicKey } from "@solana/web3.js";
-import type { RangeBetProgram } from "types/range_bet_program";
-import RANGE_BET_IDL from "idl/range_bet_program.json";
+import { calculateXForMultiBins } from "range-bet-math-core";
+import type { HeatmapDatum } from "components/features/home/heatmap/heatmap.type";
+import { bnToBigInt, bigIntToBN } from "./utils";
 
-export const calculateBinShares = async (
-  provider: AnchorProvider,
+export const calculateBinShares = (
   marketId: number,
-  binIndex: number,
-  cost: BN
-) => {
-  const program = new Program<RangeBetProgram>(RANGE_BET_IDL, provider);
-
-  // Market account address (PDA) calculation
-  const [market] = PublicKey.findProgramAddressSync(
-    [Buffer.from("market"), new BN(marketId).toArrayLike(Buffer, "le", 8)],
-    program.programId
+  binIndices: number[],
+  cost: BN,
+  heatmapData: HeatmapDatum[]
+): BN => {
+  const market = heatmapData[marketId].values;
+  const qlist = binIndices.map((binIndex) =>
+    bnToBigInt(market[binIndex])
   );
-
-  const shares: BN = await program.methods
-    .calculateXForBin(new BN(marketId), binIndex, cost)
-    .accounts({ market })
-    .view();
-
-  return shares;
+  const t = market.reduce((acc, curr) => acc.add(curr), new BN(0));
+  const shares = calculateXForMultiBins(
+    bnToBigInt(cost),
+    new BigUint64Array(qlist.sort()),
+    bnToBigInt(t)
+  );
+  return bigIntToBN(shares);
 };

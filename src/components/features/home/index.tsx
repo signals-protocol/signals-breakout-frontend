@@ -11,7 +11,7 @@ export default function Home() {
     isHeatmap, setIsHeatmap,
     selectedDate, setSelectedDate,
     selectedMarketId,
-    currentBinId, currBin, binIndices,
+    currentBins, setCurrentBins, currRange, binIndices,
     amount, setAmount,
     heatmapData,
     priceBins,
@@ -51,18 +51,20 @@ export default function Home() {
                 priceBins={priceBins}
                 heatmapData={heatmapData}
                 selectedMarketId={selectedMarketId}
-                currentBinId={currentBinId}
-                onBinClick={onBinClick}
+                currentBins={currentBins}
+                setCurrentBins={setCurrentBins}
+                // onBinClick={onBinClick}
               />
             ))}
         </div>
         <div className="min-w-[340px]">
           <PredictionInput
+            heatmapData={heatmapData}
             tickets={tickets}
             selectedMarketId={selectedMarketId}
-            currentBinId={currentBinId}
+            currentBins={currentBins}
             selectedDate={selectedDate}
-            currBin={currBin}
+            currRange={currRange}
             amount={amount}
             setAmount={setAmount}
             balance={balance}

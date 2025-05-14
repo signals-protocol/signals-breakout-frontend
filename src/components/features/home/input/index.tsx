@@ -6,30 +6,32 @@ import { InputAmount } from "./InputAmount";
 import { avgPriceFormatter, dollarFormatter } from "utils/formatter";
 import { ToWin } from "./ToWin";
 import { parseBN } from "utils/format-bn";
-
+import type { HeatmapDatum } from "../heatmap/heatmap.type";
 interface PredictionInputProps {
   tickets: BN;
   selectedMarketId: number;
-  currentBinId: number;
+  currentBins: number[];
   selectedDate: Date;
-  currBin: [number, number];
+  currRange: [number, number];
   amount: string;
   setAmount: (amount: string) => void;
   balance: number;
   isTicketLoading: boolean;
   refreshMap: () => Promise<void>;
+  heatmapData?: HeatmapDatum[];
 }
 export default function PredictionInput({
   selectedMarketId,
-  currentBinId,
+  currentBins,
   selectedDate,
-  currBin,
+  currRange,
   tickets,
   amount,
   setAmount,
   balance,
   isTicketLoading,
   refreshMap,
+  heatmapData,
 }: PredictionInputProps) {
   const ZERO = new BN(0);
   const avgPrice = tickets.gt(ZERO)
@@ -38,11 +40,12 @@ export default function PredictionInput({
         .div(tickets)
     : ZERO;
   const action = useAction({
-    currentBinId,
+    currentBins,
     selectedMarketId,
     collateral: amount,
     shares: tickets,
     refreshMap,
+    marketInfo: heatmapData?.[selectedMarketId],
   });
 
   const avgPriceText = avgPriceFormatter(avgPrice);
@@ -51,10 +54,10 @@ export default function PredictionInput({
       <div>
         <p className="text-neutral-500 font-medium">Prediction</p>
         <div className="flex justify-between mb-5">
-          {currBin ? (
+          {currRange ? (
             <div className="font-bold text-xl">
               <p className="underline">
-                {dollarFormatter(currBin[0])} ~ {dollarFormatter(currBin[1])}
+                {dollarFormatter(currRange[0])} ~ {dollarFormatter(currRange[1])}
               </p>
               <p>
                 on{" "}

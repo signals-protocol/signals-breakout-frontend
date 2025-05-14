@@ -10,13 +10,15 @@ import { parseBN } from "utils/format-bn";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import CORE_PROGRAMS from "core/core.programs.config";
 import ROUTES from "routes/route-names";
+import type { HeatmapDatum } from "../heatmap/heatmap.type";
 
 interface UseActionProps {
-  currentBinId: number | null;
+  currentBins: number[];
   selectedMarketId: number;
   collateral: string;
   shares: BN;
   refreshMap: () => Promise<void>;
+  marketInfo?: HeatmapDatum;
 }
 
 type ActionState =
@@ -26,18 +28,19 @@ type ActionState =
   | "done";
 
 export default function useAction({
-  currentBinId,
+  currentBins,
   selectedMarketId,
   collateral,
   shares,
   refreshMap,
+  marketInfo,
 }: UseActionProps) {
   const nav = useNavigate();
   const wallet = useWallet();
   const { connection } = useConnection();
 
   const predict = async () => {
-    if (currentBinId === null) return;
+    if (currentBins.length === 0 || !marketInfo) return;
     if (!wallet.publicKey) return;
     try {
       setState("predict-loading");
@@ -65,11 +68,16 @@ export default function useAction({
         wallet.publicKey
       );
 
+      // sort currentBins by q
+      const sortedCurrentBins = [...currentBins].sort((idxA, idxB) =>
+        marketInfo.values[idxA].sub(marketInfo.values[idxB]).toNumber()
+      );
+
       await program.methods
         .buyTokens(
           new BN(selectedMarketId),
-          [currentBinId],
-          [shares],
+          sortedCurrentBins,
+          Array(sortedCurrentBins.length).fill(shares),
           parseBN(collateral).mul(new BN(110)).div(new BN(100))
         )
         .accounts({

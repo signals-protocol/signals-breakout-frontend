@@ -1,14 +1,13 @@
+import BN from "bn.js";
 import { useEffect, useMemo, useState } from "react";
 import { addDays, differenceInDays } from "date-fns";
-import BN from "bn.js";
 import type { HeatmapDatum } from "../heatmap/heatmap.type";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { getHeatmapData } from "core/getHeatmapData";
 import { calculateBinShares } from "core/calculateBinShares";
 import { parseBN } from "utils/format-bn";
 import { getUSDCBalance } from "core/token";
-import { createPriceBins } from "core/utils";
-import { AnchorProvider } from "@coral-xyz/anchor";
+import { createPriceBins, getBinRange } from "core/utils";
 
 export const usePredictionInput = (
   dateBase: Date,
@@ -19,8 +18,7 @@ export const usePredictionInput = (
   const [isHeatmap, setIsHeatmap] = useState(true);
   // Date
   const [selectedMarketId, setSelectedMarketId] = useState<number>(6);
-  // Price Bin
-  const [currentBinId, setCurrentBinId] = useState<number>(0);
+  const [currentBins, setCurrentBins] = useState<number[]>([0]);
 
   const priceBins = useMemo(
     () => createPriceBins(priceBase, binCount),
@@ -63,23 +61,18 @@ export const usePredictionInput = (
   };
 
   useEffect(() => {
-    if (currentBinId !== null && heatmapData) {
-      const provider = new AnchorProvider(connection, wallet as any, {
-        commitment: "confirmed",
-      });
-
+    if (currentBins.length > 0 && heatmapData) {
       setIsTicketLoading(true);
-      calculateBinShares(
-        provider,
+      const shares = calculateBinShares(
         selectedMarketId,
-        currentBinId,
-        parseBN(amount || "0")
-      ).then((res) => {
-        setTickets(res);
-        setIsTicketLoading(false);
-      });
+        currentBins,
+        parseBN(amount || "0"),
+        heatmapData
+      );
+      setTickets(shares);
+      setIsTicketLoading(false);
     }
-  }, [selectedMarketId, currentBinId, amount, heatmapData]);
+  }, [selectedMarketId, currentBins, amount, heatmapData]);
 
   useEffect(() => {
     refreshMap();
@@ -89,13 +82,9 @@ export const usePredictionInput = (
     refreshBalance();
   }, [wallet.publicKey]);
 
-  const currBin: [number, number] = [
-    priceBins[currentBinId],
-    priceBins[currentBinId + 1],
-  ];
-
+  const currRange: [number, number] = getBinRange(currentBins, priceBins);
   const onBinClick = (marketId: number, binId: number) => {
-    setCurrentBinId(binId);
+    setCurrentBins([binId]);
     setSelectedMarketId(marketId);
     setIsHeatmap(false);
   };
@@ -111,9 +100,9 @@ export const usePredictionInput = (
     binIndices: Array(binCount)
       .fill(0)
       .map((_, i) => i),
-    currentBinId,
-    setCurrentBinId,
-    currBin,
+    currentBins,
+    setCurrentBins,
+    currRange,
     onBinClick,
     tickets,
     amount,

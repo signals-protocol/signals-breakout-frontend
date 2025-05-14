@@ -11,7 +11,7 @@ export interface PredictionBase {
   result: "Win" | "Loss" | null;
   shares: BN;
   txHash: string;
-  binIndex: number;
+  binIndices: number[];
   marketId: number;
   totalCost: string;
   blockTime: number;

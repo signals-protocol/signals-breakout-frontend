@@ -1,4 +1,4 @@
-import type { PredictionBase, TokensBought } from "./interfaces";
+import type { LivePrediction, TokensBought } from "./interfaces";
 import { addDays } from "date-fns";
 import { avgPriceFormatter, dollarFormatter } from "utils/formatter";
 import { timeFormat } from "d3";
@@ -7,26 +7,29 @@ import PREDICTION_CONSTANTS from "../home/input/constants";
 import { Program, AnchorProvider } from "@coral-xyz/anchor";
 import type { RangeBetProgram } from "types/range_bet_program";
 import RANGE_BET_IDL from "idl/range_bet_program.json";
-import type { VersionedTransactionResponse } from "@solana/web3.js";
+import type { Connection, VersionedTransactionResponse } from "@solana/web3.js";
 import { decodeBuyTokensInstruction } from "core/decodeBuyTokensInstruction";
 import { formatBN, parseBN } from "utils/format-bn";
 import { calculateBinSellCost } from "core/calculateBinSellCost";
 import pLimit from "p-limit";
-
+import type { WalletContextState } from "@solana/wallet-adapter-react";
 export const parsePredictionLogs = async (
   signatures: string[],
   txs: VersionedTransactionResponse[],
-  provider: AnchorProvider
-  // ): Promise<LivePrediction[]> => {
-): Promise<any> => {
+  connection: Connection,
+  wallet: WalletContextState
+  ): Promise<LivePrediction[]> => {
   // assume that only one bin is target
   const priceBins = createPriceBins(
     PREDICTION_CONSTANTS.priceBase,
     PREDICTION_CONSTANTS.binCount
   );
+  const provider = new AnchorProvider(connection, wallet as any, {
+    commitment: "confirmed",
+  });
   const program = new Program<RangeBetProgram>(RANGE_BET_IDL, provider);
 
-  const preparsedList: PredictionBase[] = [];
+  const preparsedList: LivePrediction[] = [];
   txs.forEach((tx, i) => {
     const dataLine = tx
       .meta!.logMessages!.map((l) => l.replace(/^Program data: /, ""))
@@ -43,8 +46,8 @@ export const parsePredictionLogs = async (
       );
       const decoded = decodeBuyTokensInstruction(Array.from(instr!.data));
 
-      const binIndex = decoded.binIndices[0];
-      const range = getBinRange(binIndex, priceBins)!;
+      const binIndices = decoded.binIndices;
+      const range = getBinRange(binIndices, priceBins)!;
       const tickets = decoded.amounts[0];
       const avg = eventLog.totalCost.mul(parseBN("1")).div(tickets);
       const date = addDays(
@@ -63,7 +66,7 @@ export const parsePredictionLogs = async (
         date: timeFormat("%-d %b %Y")(date),
         result: null,
         shares: tickets,
-        binIndex,
+        binIndices,
         marketId: eventLog.marketId.toNumber(),
         totalCost: eventLog.totalCost.toString(),
         txHash: signatures[i],
@@ -77,9 +80,10 @@ export const parsePredictionLogs = async (
   const currValues = preparsedList.map(async (prediction) => {
     return limit(async () =>
       calculateBinSellCost(
-        provider,
+        connection,
+        wallet,
         prediction.marketId,
-        prediction.binIndex,
+        prediction.binIndices,
         prediction.shares
       )
     );
