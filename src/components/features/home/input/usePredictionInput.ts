@@ -1,13 +1,13 @@
 import BN from "bn.js";
 import { useEffect, useMemo, useState } from "react";
 import { addDays, differenceInDays } from "date-fns";
-import type { HeatmapDatum } from "../heatmap/heatmap.type";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { getHeatmapData } from "core/getHeatmapData";
 import { calculateBinShares } from "core/calculateBinShares";
 import { parseBN } from "utils/format-bn";
 import { getUSDCBalance } from "core/token";
 import { createPriceBins, getBinRange } from "core/utils";
+import { useProgram } from "core/useProgram";
+import type { HeatmapDatum } from "../heatmap/heatmap.type";
 
 export const usePredictionInput = (
   dateBase: Date,
@@ -32,8 +32,7 @@ export const usePredictionInput = (
   const [isMapLoading, setIsMapLoading] = useState<boolean>(false);
   const [isTicketLoading, setIsTicketLoading] = useState<boolean>(false);
 
-  const wallet = useWallet();
-  const { connection } = useConnection();
+  const { wallet, connection, program } = useProgram();
 
   const refreshBalance = async () => {
     if (wallet.publicKey) {
@@ -48,16 +47,12 @@ export const usePredictionInput = (
   const refreshMap = async () => {
     setIsMapLoading(true);
     refreshBalance();
-    return getHeatmapData(
-      connection,
-      wallet,
-      dateBase,
-      priceBase,
-      priceStep
-    ).then((data) => {
-      setHeatmapData(data.heatmapData);
-      setIsMapLoading(false);
-    });
+    return getHeatmapData(program, dateBase, priceBase, priceStep).then(
+      (data) => {
+        setHeatmapData(data.heatmapData);
+        setIsMapLoading(false);
+      }
+    );
   };
 
   useEffect(() => {

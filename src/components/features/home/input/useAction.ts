@@ -1,8 +1,4 @@
 import BN from "bn.js";
-import RANGE_BET_IDL from "idl/range_bet_program.json";
-import { Program, AnchorProvider } from "@coral-xyz/anchor";
-import type { RangeBetProgram } from "types/range_bet_program";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { PublicKey } from "@solana/web3.js";
@@ -11,6 +7,7 @@ import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import CORE_PROGRAMS from "core/core.programs.config";
 import ROUTES from "routes/route-names";
 import type { HeatmapDatum } from "../heatmap/heatmap.type";
+import { useProgram } from "core/useProgram";
 
 interface UseActionProps {
   currentBins: number[];
@@ -36,19 +33,13 @@ export default function useAction({
   marketInfo,
 }: UseActionProps) {
   const nav = useNavigate();
-  const wallet = useWallet();
-  const { connection } = useConnection();
+  const { wallet, program } = useProgram();
 
   const predict = async () => {
     if (currentBins.length === 0 || !marketInfo) return;
     if (!wallet.publicKey) return;
     try {
       setState("predict-loading");
-
-      const provider = new AnchorProvider(connection, wallet as any, {
-        commitment: "confirmed",
-      });
-      const program = new Program<RangeBetProgram>(RANGE_BET_IDL, provider);
 
       const [vaultAuth] = PublicKey.findProgramAddressSync(
         [

@@ -1,17 +1,13 @@
-import { AnchorProvider, BN, Program } from "@coral-xyz/anchor";
-import { Connection, PublicKey } from "@solana/web3.js";
+import CORE_PROGRAMS from "./core.programs.config";
+import { BN, Program } from "@coral-xyz/anchor";
+import { PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { addDays } from "date-fns";
-import RANGE_BET_IDL from "idl/range_bet_program.json";
-import CORE_PROGRAMS from "./core.programs.config";
-import type { WalletContextState } from "@solana/wallet-adapter-react";
 import type { RangeBetProgram } from "types/range_bet_program";
 import type { HeatmapDatum } from "components/features/home/heatmap/heatmap.type";
 
-
 export const getHeatmapData = async (
-  connection: Connection,
-  wallet: WalletContextState,
+  program: Program<RangeBetProgram>,
   dateBase: Date,
   priceBase: number,
   priceStep: number
@@ -19,23 +15,27 @@ export const getHeatmapData = async (
   heatmapData: HeatmapDatum[];
   priceBins: number[];
 }> => {
-  const provider = new AnchorProvider(connection, wallet as any, {
-    commitment: "confirmed",
-  });
-  const program = new Program<RangeBetProgram>(RANGE_BET_IDL, provider);
   const collateralMint = new PublicKey(CORE_PROGRAMS.USDC);
 
+  console.log(123)
   // 모든 마켓 PDA 주소 계산
-  const marketPDAs = Array.from({ length: 31 }, (_, i) => 
-    PublicKey.findProgramAddressSync(
-      [Buffer.from("market"), new BN(i).toArrayLike(Buffer, "le", 8)],
-      program.programId
-    )[0]
+  const marketPDAs = Array.from(
+    { length: 31 },
+    (_, i) =>
+      PublicKey.findProgramAddressSync(
+        [Buffer.from("market"), new BN(i).toArrayLike(Buffer, "le", 8)],
+        program.programId
+      )[0]
   );
+  console.log(456)
 
   // 모든 마켓 정보 한 번에 조회
-  const marketInfos = await connection.getMultipleAccountsInfo(marketPDAs);
-  
+  const marketInfos = await program.provider.connection.getMultipleAccountsInfo(
+    marketPDAs
+  );
+  console.log(789)
+
+
   // 활성화된 마켓만 필터링
   const activeMarkets = marketInfos
     .map((info, index) => {
@@ -47,25 +47,27 @@ export const getHeatmapData = async (
     .filter((market): market is NonNullable<typeof market> => market !== null);
 
   // 활성화된 마켓들의 볼트 정보 조회
-  const vaultPromises = activeMarkets.map(async ({ marketId, marketInfo, pda }) => {
-    const [vaultAuthority] = PublicKey.findProgramAddressSync(
-      [Buffer.from("vault"), new BN(marketId).toArrayLike(Buffer, "le", 8)],
-      program.programId
-    );
+  const vaultPromises = activeMarkets.map(
+    async ({ marketId, marketInfo, pda }) => {
+      const [vaultAuthority] = PublicKey.findProgramAddressSync(
+        [Buffer.from("vault"), new BN(marketId).toArrayLike(Buffer, "le", 8)],
+        program.programId
+      );
 
-    const vaultTokenAccount = await getAssociatedTokenAddress(
-      collateralMint,
-      vaultAuthority,
-      true
-    );
+      const vaultTokenAccount = await getAssociatedTokenAddress(
+        collateralMint,
+        vaultAuthority,
+        true
+      );
 
-    return {
-      marketId,
-      marketInfo,
-      pda,
-      vaultTokenAccount
-    };
-  });
+      return {
+        marketId,
+        marketInfo,
+        pda,
+        vaultTokenAccount,
+      };
+    }
+  );
 
   const results = await Promise.all(vaultPromises);
 
@@ -76,11 +78,12 @@ export const getHeatmapData = async (
       date,
       values: result.marketInfo.bins as BN[],
       state: result.marketInfo.active ? "open" : "closed",
-    }
+    };
   });
 
-  const priceBins = Array.from({ length: binLength }, (_, i) => 
-    priceBase + priceStep * i
+  const priceBins = Array.from(
+    { length: binLength },
+    (_, i) => priceBase + priceStep * i
   );
 
   return {

@@ -4,30 +4,23 @@ import { avgPriceFormatter, dollarFormatter } from "utils/formatter";
 import { timeFormat } from "d3";
 import { createPriceBins, getBinRange } from "core/utils";
 import PREDICTION_CONSTANTS from "../home/input/constants";
-import { Program, AnchorProvider } from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import type { RangeBetProgram } from "types/range_bet_program";
-import RANGE_BET_IDL from "idl/range_bet_program.json";
-import type { Connection, VersionedTransactionResponse } from "@solana/web3.js";
+import type { VersionedTransactionResponse } from "@solana/web3.js";
 import { decodeBuyTokensInstruction } from "core/decodeBuyTokensInstruction";
 import { formatBN, parseBN } from "utils/format-bn";
 import { calculateBinSellCost } from "core/calculateBinSellCost";
 import pLimit from "p-limit";
-import type { WalletContextState } from "@solana/wallet-adapter-react";
+
 export const parsePredictionLogs = async (
   signatures: string[],
   txs: VersionedTransactionResponse[],
-  connection: Connection,
-  wallet: WalletContextState
-  ): Promise<LivePrediction[]> => {
-  // assume that only one bin is target
+  program: Program<RangeBetProgram>
+): Promise<LivePrediction[]> => {
   const priceBins = createPriceBins(
     PREDICTION_CONSTANTS.priceBase,
     PREDICTION_CONSTANTS.binCount
   );
-  const provider = new AnchorProvider(connection, wallet as any, {
-    commitment: "confirmed",
-  });
-  const program = new Program<RangeBetProgram>(RANGE_BET_IDL, provider);
 
   const preparsedList: LivePrediction[] = [];
   txs.forEach((tx, i) => {
@@ -80,8 +73,7 @@ export const parsePredictionLogs = async (
   const currValues = preparsedList.map(async (prediction) => {
     return limit(async () =>
       calculateBinSellCost(
-        connection,
-        wallet,
+        program,
         prediction.marketId,
         prediction.binIndices,
         prediction.shares

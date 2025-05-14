@@ -4,15 +4,15 @@ import { Tabs, type TabType } from "./Tabs";
 import type { LivePrediction } from "./interfaces";
 import { LivePredictionRow } from "./LivePredictionRow";
 import { dollarFormatter } from "utils/formatter";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import CORE_PROGRAMS from "core/core.programs.config";
 import pLimit from "p-limit";
 import { parsePredictionLogs } from "./parser"; 
-
+import { useProgram } from "core/useProgram";
 const PredictionHistory = () => {
   const wallet = useWallet();
-  const { connection } = useConnection();
+  const { connection, program } = useProgram();
 
   const [items, setItems] = useState<LivePrediction[]>([]);
 
@@ -50,8 +50,7 @@ const PredictionHistory = () => {
     const parsed = await parsePredictionLogs(
       intersection.map((log) => log.signature),
       results,
-      connection,
-      wallet
+      program
     );
     setItems(parsed);
   }
