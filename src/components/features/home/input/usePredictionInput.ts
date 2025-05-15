@@ -4,10 +4,10 @@ import { addDays, differenceInDays } from "date-fns";
 import { getHeatmapData } from "core/getHeatmapData";
 import { calculateBinShares } from "core/calculateBinShares";
 import { parseBN } from "utils/format-bn";
-import { getUSDCBalance } from "core/token";
 import { createPriceBins, getBinRange } from "core/utils";
 import { useProgram } from "core/useProgram";
 import type { HeatmapDatum } from "../heatmap/heatmap.type";
+import useBalance from "states/balance.state";
 
 export const usePredictionInput = (
   dateBase: Date,
@@ -27,22 +27,12 @@ export const usePredictionInput = (
 
   const [tickets, setTickets] = useState<BN>(new BN(0));
   const [amount, setAmount] = useState<string>("1");
-  const [balance, setBalance] = useState<number>(0);
   const [heatmapData, setHeatmapData] = useState<HeatmapDatum[]>();
   const [isMapLoading, setIsMapLoading] = useState<boolean>(false);
   const [isTicketLoading, setIsTicketLoading] = useState<boolean>(false);
 
-  const { wallet, connection, program } = useProgram();
-
-  const refreshBalance = async () => {
-    if (wallet.publicKey) {
-      getUSDCBalance(connection, wallet.publicKey).then((balance) => {
-        setBalance(balance);
-      });
-    } else {
-      setBalance(0);
-    }
-  };
+  const { wallet, program } = useProgram();
+  const { balance, refreshBalance } = useBalance();
 
   const refreshMap = async () => {
     setIsMapLoading(true);

@@ -1,15 +1,11 @@
 import { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Program, BN, AnchorProvider } from "@coral-xyz/anchor";
-import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddress,
-} from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
 import collateralTokenFaucetIdl from "idl/collateral_token_faucet.json";
 import type { CollateralTokenFaucet } from "types/collateral_token_faucet";
 import CORE_PROGRAMS from "core/core.programs.config";
+import useBalance from "states/balance.state";
 interface FaucetModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +15,7 @@ export default function FaucetModal({ isOpen, onClose }: FaucetModalProps) {
   const [loading, setLoading] = useState(false);
   const { connection } = useConnection();
   const wallet = useWallet();
+  const { refreshBalance } = useBalance();
 
   const handleSolFaucet = () => {
     window.open("https://faucet.solana.com/", "_blank");
@@ -50,6 +47,7 @@ export default function FaucetModal({ isOpen, onClose }: FaucetModalProps) {
         })
         .rpc();
 
+      await refreshBalance();
       alert("5 USDC has been successfully minted!");
     } catch (error) {
       console.error("USDC Faucet error:", error);
