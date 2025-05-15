@@ -12,7 +12,7 @@ export default function Home() {
     selectedDate, setSelectedDate,
     selectedMarketId,
     currentBins, setCurrentBins, currRange, binIndices,
-    amount, setAmount,
+    cost: amount, setCost: setAmount,
     heatmapData,
     priceBins,
     onBinClick,

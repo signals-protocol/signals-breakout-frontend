@@ -69,7 +69,7 @@ export default function useAction({
           new BN(selectedMarketId),
           sortedCurrentBins,
           Array(sortedCurrentBins.length).fill(shares),
-          parseBN(collateral).mul(new BN(110)).div(new BN(100))
+          parseBN(collateral, 6).mul(new BN(110)).div(new BN(100))
         )
         .accounts({
           user: wallet.publicKey,

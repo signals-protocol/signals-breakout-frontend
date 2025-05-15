@@ -26,7 +26,7 @@ export const usePredictionInput = (
   );
 
   const [tickets, setTickets] = useState<BN>(new BN(0));
-  const [amount, setAmount] = useState<string>("1");
+  const [cost, setCost] = useState<string>("1");
   const [heatmapData, setHeatmapData] = useState<HeatmapDatum[]>();
   const [isMapLoading, setIsMapLoading] = useState<boolean>(false);
   const [isTicketLoading, setIsTicketLoading] = useState<boolean>(false);
@@ -51,13 +51,13 @@ export const usePredictionInput = (
       const shares = calculateBinShares(
         selectedMarketId,
         currentBins,
-        parseBN(amount || "0"),
+        parseBN(cost || "0", 6),
         heatmapData
       );
       setTickets(shares);
       setIsTicketLoading(false);
     }
-  }, [selectedMarketId, currentBins, amount, heatmapData]);
+  }, [selectedMarketId, currentBins, cost, heatmapData]);
 
   useEffect(() => {
     refreshMap();
@@ -90,8 +90,8 @@ export const usePredictionInput = (
     currRange,
     onBinClick,
     tickets,
-    amount,
-    setAmount,
+    cost,
+    setCost,
     heatmapData,
     balance,
     isTicketLoading,
