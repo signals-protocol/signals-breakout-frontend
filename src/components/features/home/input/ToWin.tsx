@@ -4,11 +4,11 @@ import { dollarFormatter } from "utils/formatter";
 
 export const ToWin = ({
   isTicketLoading,
-  tickets,
+  shares,
   avgPriceText,
 }: {
   isTicketLoading: boolean;
-  tickets: BN;
+  shares: BN;
   avgPriceText: string;
 }) => {
   return (
@@ -18,7 +18,7 @@ export const ToWin = ({
         <p className="text-neutral-500 text-sm">Avg {avgPriceText}</p>
       </div>
       <p className="text-positive font-bold text-xl">
-        {isTicketLoading ? `...` : `${dollarFormatter(formatBN(tickets))}`}
+        {isTicketLoading ? `...` : `${dollarFormatter(formatBN(shares, 6))}`}
       </p>
     </div>
   );

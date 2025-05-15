@@ -54,8 +54,8 @@ export const parsePredictionLogs = async (
           2
         )}`,
         avg: avgPriceFormatter(avg),
-        bet: formatBN(eventLog.totalCost),
-        toWin: formatBN(tickets),
+        bet: formatBN(eventLog.totalCost, 6),
+        toWin: formatBN(tickets, 6),
         date: timeFormat("%-d %b %Y")(date),
         result: null,
         shares: tickets,
@@ -83,7 +83,7 @@ export const parsePredictionLogs = async (
 
   const withCurrValue = await Promise.all(currValues).then((values) => {
     return values.map((v, index) => {
-      const value = formatBN(v);
+      const value = formatBN(v, 6);
       return {
         ...preparsedList[index],
         value,

@@ -28,7 +28,7 @@ export function LivePredictionRow({ prediction }: LivePredictionRowProps) {
           <u className="ml-1">{prediction.date}</u>
         </div>
         <div className="text-sm text-neutral-500">
-          {(+formatBN(prediction.shares)).toFixed(2)} Shares
+          {(+formatBN(prediction.shares, 6)).toFixed(2)} Shares
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

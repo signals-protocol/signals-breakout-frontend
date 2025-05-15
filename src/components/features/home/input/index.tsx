@@ -8,13 +8,13 @@ import { ToWin } from "./ToWin";
 import { parseBN } from "utils/format-bn";
 import type { HeatmapDatum } from "../heatmap/heatmap.type";
 interface PredictionInputProps {
-  tickets: BN;
+  shares: BN;
   selectedMarketId: number;
   currentBins: number[];
   selectedDate: Date;
   currRange: [number, number];
-  amount: string;
-  setAmount: (amount: string) => void;
+  cost: string;
+  setCost: (amount: string) => void;
   balance: number;
   isTicketLoading: boolean;
   refreshMap: () => Promise<void>;
@@ -25,25 +25,25 @@ export default function PredictionInput({
   currentBins,
   selectedDate,
   currRange,
-  tickets,
-  amount,
-  setAmount,
+  shares,
+  cost,
+  setCost,
   balance,
   isTicketLoading,
   refreshMap,
   heatmapData,
 }: PredictionInputProps) {
   const ZERO = new BN(0);
-  const avgPrice = tickets.gt(ZERO)
-    ? parseBN(amount || "0")
+  const avgPrice = shares.gt(ZERO)
+    ? parseBN(cost || "0", 6)
         .mul(parseBN("1"))
-        .div(tickets)
+        .div(shares)
     : ZERO;
   const action = useAction({
     currentBins,
     selectedMarketId,
-    collateral: amount,
-    shares: tickets,
+    collateral: cost,
+    shares: shares,
     refreshMap,
     marketInfo: heatmapData?.[selectedMarketId],
   });
@@ -57,7 +57,8 @@ export default function PredictionInput({
           {currRange ? (
             <div className="font-bold text-xl">
               <p className="underline">
-                {dollarFormatter(currRange[0])} ~ {dollarFormatter(currRange[1])}
+                {dollarFormatter(currRange[0])} ~{" "}
+                {dollarFormatter(currRange[1])}
               </p>
               <p>
                 on{" "}
@@ -84,13 +85,13 @@ export default function PredictionInput({
 
         <hr className="border-neutral-200" />
 
-        <InputAmount amount={amount} setAmount={setAmount} balance={balance} />
+        <InputAmount amount={cost} setAmount={setCost} balance={balance} />
 
         <hr className="border-neutral-200" />
 
         <ToWin
           isTicketLoading={isTicketLoading}
-          tickets={tickets}
+          shares={shares}
           avgPriceText={avgPriceText}
         />
       </div>

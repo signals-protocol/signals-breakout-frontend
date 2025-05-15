@@ -12,7 +12,9 @@ export function EndedPredictionRow({ prediction }: EndedPredictionRowProps) {
         <div className="text-sm font-medium text-gray-900">
           {prediction.range}
         </div>
-        <div className="text-sm text-gray-500">{formatBN(prediction.shares)}</div>
+        <div className="text-sm text-gray-500">
+          {formatBN(prediction.shares, 6)}
+        </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span

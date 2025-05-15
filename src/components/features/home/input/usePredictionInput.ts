@@ -25,7 +25,7 @@ export const usePredictionInput = (
     [priceBase, binCount]
   );
 
-  const [tickets, setTickets] = useState<BN>(new BN(0));
+  const [shares, setShares] = useState<BN>(new BN(0));
   const [cost, setCost] = useState<string>("1");
   const [heatmapData, setHeatmapData] = useState<HeatmapDatum[]>();
   const [isMapLoading, setIsMapLoading] = useState<boolean>(false);
@@ -54,7 +54,7 @@ export const usePredictionInput = (
         parseBN(cost || "0", 6),
         heatmapData
       );
-      setTickets(shares);
+      setShares(shares);
       setIsTicketLoading(false);
     }
   }, [selectedMarketId, currentBins, cost, heatmapData]);
@@ -89,7 +89,7 @@ export const usePredictionInput = (
     setCurrentBins,
     currRange,
     onBinClick,
-    tickets,
+    shares,
     cost,
     setCost,
     heatmapData,
