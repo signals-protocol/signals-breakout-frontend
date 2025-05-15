@@ -15,6 +15,8 @@
   --color-primary: #1444c2; /* DEFAULT */
   --color-success: #34a853;
   --color-bitcoin: #f7931a;
+  --color-positive: #00BF40;
+  --color-negative: #FF0000;
 }
 
 @layer components {
