@@ -81,6 +81,7 @@ export default function useAction({
       setState("done");
       await refreshMap();
     } catch (error) {
+      console.error(error);
       setState("can-predict");
     }
   };

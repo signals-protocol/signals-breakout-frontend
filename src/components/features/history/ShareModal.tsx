@@ -109,6 +109,7 @@ export function ShareModal({
         alert("Image downloaded successfully.");
       }
     } catch (error) {
+      console.error(error);
       alert("Failed to share.");
     }
   };
