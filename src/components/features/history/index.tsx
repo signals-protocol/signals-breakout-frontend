@@ -25,7 +25,7 @@ const PredictionHistory = () => {
   async function getPredictionHistory(publicKey: PublicKey) {
     const programId = new PublicKey(CORE_PROGRAMS.RANGE_BET);
     const programLogs = await connection.getSignaturesForAddress(programId, {
-      limit: 500,
+      limit: 100,
     });
     const userLogs = await connection.getSignaturesForAddress(publicKey, {
       limit: 100,

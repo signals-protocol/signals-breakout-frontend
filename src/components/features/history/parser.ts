@@ -69,7 +69,7 @@ export const parsePredictionLogs = async (
     }
   });
 
-  const limit = pLimit(50);
+  const limit = pLimit(30);
   const currValues = preparsedList.map(async (prediction) => {
     return limit(async () =>
       calculateBinSellCost(
