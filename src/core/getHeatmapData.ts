@@ -16,8 +16,6 @@ export const getHeatmapData = async (
   priceBins: number[];
 }> => {
   const collateralMint = new PublicKey(CORE_PROGRAMS.USDC);
-
-  console.log(123)
   // 모든 마켓 PDA 주소 계산
   const marketPDAs = Array.from(
     { length: 31 },
@@ -27,14 +25,11 @@ export const getHeatmapData = async (
         program.programId
       )[0]
   );
-  console.log(456)
 
   // 모든 마켓 정보 한 번에 조회
   const marketInfos = await program.provider.connection.getMultipleAccountsInfo(
     marketPDAs
   );
-  console.log(789)
-
 
   // 활성화된 마켓만 필터링
   const activeMarkets = marketInfos

@@ -61,10 +61,10 @@ export const InputAmount = ({
         <button onClick={() => handleAddAmount("1")} className="chip">
           +$1
         </button>
-        <button onClick={() => handleAddAmount("20")} className="chip">
+        <button onClick={() => handleAddAmount("3")} className="chip">
           +$3
         </button>
-        <button onClick={() => handleAddAmount("100")} className="chip">
+        <button onClick={() => handleAddAmount("5")} className="chip">
           +$5
         </button>
         <button onClick={() => handleAddAmount("Max")} className="chip">
