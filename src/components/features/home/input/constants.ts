@@ -1,5 +1,5 @@
 const PREDICTION_CONSTANTS = {
-    dateBase: new Date("2025-05-09"),
+    dateBase: new Date("2025-05-27"),
     priceBase: 90000,
     priceStep: 500,
     binBase: -240,
